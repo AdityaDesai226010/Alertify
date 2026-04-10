@@ -9,7 +9,7 @@ import com.google.android.gms.location.Priority;
 public class LocationHelper {
 
     public interface LocationCallback {
-        void onLocationResult(String locationLink);
+        void onLocationResult(double lat, double lng, String locationLink);
         void onLocationError(String error);
     }
 
@@ -23,7 +23,7 @@ public class LocationHelper {
                     double lat = location.getLatitude();
                     double lng = location.getLongitude();
                     String link = "https://maps.google.com/?q=" + lat + "," + lng;
-                    callback.onLocationResult(link);
+                    callback.onLocationResult(lat, lng, link);
                 } else {
                     callback.onLocationError("Location is null");
                 }
