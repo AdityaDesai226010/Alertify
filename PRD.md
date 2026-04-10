@@ -7,27 +7,28 @@
 
 # 1. 📌 Overview
 
-**Alertify** is a mobile safety application that enables users to **trigger emergency alerts using multiple hidden and smart activation methods**, ensuring **instant help even in critical situations where manual interaction is not possible**.
+**Alertify** is a mobile safety application designed to provide **instant emergency assistance through multiple hidden trigger mechanisms**, ensuring users can send alerts even when they are unable to manually operate their phone.
 
-The system combines **hardware triggers + real-time communication + proximity-based alerts** to maximize safety.
+The system integrates **sensor-based triggers, voice recognition, and communication modules** to automatically notify emergency contacts and nearby users with real-time location data.
 
 ---
 
 # 2. 🎯 Objectives
 
-* Enable **instant SOS activation without unlocking phone**
-* Provide **multi-layer emergency communication**
+* Enable **quick SOS activation without unlocking the phone**
+* Provide **multiple hidden trigger options**
 * Ensure **real-time location tracking**
-* Create a **community-based nearby alert system**
+* Enable **automatic emergency communication**
+* Build a **community-based nearby alert system**
 
 ---
 
 # 3. 👥 Target Users
 
-* Women (primary focus)
+* Women (Primary focus)
 * College students
 * Night commuters
-* Elderly users
+* Elderly individuals
 * Children
 
 ---
@@ -38,256 +39,284 @@ The system combines **hardware triggers + real-time communication + proximity-ba
 
 ## 🔴 4.1 Trigger Engine (Multi-Trigger Detection System)
 
+The Trigger Engine continuously runs in the background and detects emergency activation signals.
+
+---
+
 ### 📳 1. Shake Detection
 
-* Detect rapid shake using accelerometer
-* Configurable sensitivity
-* Threshold-based activation
+* Uses **accelerometer sensor**
+* Detects rapid shaking motion
+* Configurable sensitivity level
+* Threshold-based activation logic
 
 ---
 
 ### 🔘 2. Volume Button Trigger
 
-* Detect multiple presses of volume down button
+* Detects multiple presses of volume down button
 
 **Condition:**
 
-* 3–5 presses within 2 seconds
+* 3–5 presses within 2 seconds triggers emergency
 
 ---
 
 ### 🎙️ 3. Voice Trigger
 
-* Detect phrase: **“Help me!”**
-* Background listening (optimized mode)
+* Detects keyword: **“Help me!”**
+* Uses Android Speech Recognition API
+* Runs in optimized background mode
 
 ---
 
 ### 📞 4. Secret Dial Code
 
-* User enters secret code in dial pad (e.g., `*123#`)
-* Triggers alert silently
+* User enters predefined code (e.g., `*123#`)
+* Triggers emergency silently
 
 ---
 
 # 5. 🚨 Emergency Response System
 
-When triggered, the system executes **parallel emergency actions**:
+Once any trigger is activated, the system executes multiple emergency actions **in parallel**.
 
 ---
 
 ## 📞 5.1 Automated Calling
 
-* Call primary contact
-* Retry if not answered
-* Optional multi-contact calling sequence
+* Calls primary emergency contact
+* Retries if call is not answered
+* Option to call multiple contacts sequentially
 
 ---
 
 ## 📍 5.2 Live Location Sharing
 
-* Fetch GPS location
-* Generate Google Maps link
-* Update location every 5–10 seconds
+* Fetches GPS location using **Fused Location Provider**
+* Generates Google Maps link
+* Updates location every 5–10 seconds
 
 ---
 
 ## 📩 5.3 Automated SMS Alert
 
-**Message:**
+**Message Format:**
 
 ```
 I am in danger. Please help!
-Live Location: [link]
+Live Location: [Google Maps link]
 Time: [timestamp]
 ```
+
+* Sent to all emergency contacts
 
 ---
 
 ## 📡 5.4 Nearby Alert System (USP 🔥)
 
-* Notify nearby users with Alertify installed
-* Technologies:
+* Sends alerts to nearby Alertify users
 
-  * Internet-based (Firebase)
-  * Optional BLE (advanced)
+### Technologies Used:
 
-**Output:**
+* Firebase Realtime Database
+* Firebase Cloud Messaging (FCM)
+* Optional Bluetooth Low Energy (BLE)
 
-* Nearby users receive alert notification + location
+### Output:
+
+* Nearby users receive notification with:
+
+  * User’s location
+  * Alert message
 
 ---
 
 # 6. 🧑‍🤝‍🧑 Emergency Contacts Module
 
-* Add/edit/delete contacts
-* Priority-based system:
+* Add / edit / delete contacts
+* Priority-based contact system:
 
-  * Primary (call + SMS)
-  * Secondary (SMS only)
+  * **Primary Contacts:** Call + SMS
+  * **Secondary Contacts:** SMS only
 
 ---
 
-# 7. 🔒 Stealth & Safety
+# 7. 🔒 Stealth & Safety Features
 
 * Background service always active
-* No visible UI when triggered
-* Fake screen (calculator mode)
-* Silent activation
+* No visible UI during emergency trigger
+* Fake calculator screen for disguise
+* Silent activation mode
 
 ---
 
 # 8. 🛠️ Technical Stack
 
-### 📱 Frontend
+---
 
-* Android (java + XML)
+## 📱 Frontend
 
-### ⚙️ Backend
+* Android Development using:
 
-* Firebase:
+  * **Java**
+  * XML for UI design
+
+---
+
+## ⚙️ Backend
+
+* Firebase Services:
 
   * Realtime Database
-  * Cloud Messaging (FCM)
+  * Firebase Cloud Messaging (FCM)
 
-### 🔌 APIs & Services
+---
+
+## 🔌 APIs & Services
 
 * Google Maps API
-* Fused Location Provider
+* Fused Location Provider API
 * SMS Manager
+* Telephony API (calling)
 * Speech Recognition API
+* Sensors API (accelerometer)
 
 ---
 
 # 9. 📊 System Flow
 
 ```
-Trigger Detected (Shake / Button / Voice / Code)
-            ↓
-Validation Engine
-            ↓
-Fetch Location
-            ↓
-Parallel Execution:
-   → Call Contact
-   → Send SMS
-   → Share Live Location
-   → Notify Nearby Users
+Trigger Detected (Shake / Button / Voice / Dial Code)
+                ↓
+        Validation Engine
+                ↓
+        Fetch User Location
+                ↓
+    Parallel Execution Begins:
+        → Make Call
+        → Send SMS
+        → Share Live Location
+        → Notify Nearby Users
 ```
 
 ---
 
 # 10. 🔐 Permissions Required
 
-* Location
+* Location (Fine & Coarse)
 * SMS
 * Call
 * Microphone
-* Background activity
 * Internet
+* Foreground Service
+* Background Activity
 * Bluetooth (optional)
 
 ---
 
 # 11. ⚠️ Challenges
 
-* False triggers
-* Battery optimization
-* Background restrictions (Android)
-* Privacy concerns
+* False trigger detection
+* Battery consumption (background services)
+* Android background execution limits
+* Privacy and data security
+* Continuous voice listening optimization
 
 ---
 
 # 12. 🚀 Future Scope
 
-* AI-based danger detection
+* AI-based danger detection (behavior analysis)
 * Smartwatch integration
-* Police API integration
-* Auto video recording
+* Police/emergency services API integration
+* Automatic video/audio recording during emergencies
+* Cloud-based alert history
 
 ---
 
-# 13. 🧠 USP (Important for Judges)
+# 13. 🧠 Unique Selling Proposition (USP)
 
-> “Alertify enables emergency activation through multiple hidden triggers and extends help beyond contacts using a nearby user alert system.”
-
----
-
-# 👨‍💻 **Team Work Division (4 Members)**
-
-Now this is VERY IMPORTANT for execution 👇
+> “Alertify enables emergency activation through multiple hidden triggers and extends help beyond personal contacts using a real-time nearby user alert system.”
 
 ---
 
-## 👤 **Member 1: Android Core Developer (Triggers + Sensors)**
+# 👨‍💻 Team Work Division (4 Members)
+
+---
+
+## 👤 Member 1: Android Core Developer (Triggers + Background Services)
 
 ### Responsibilities:
 
-* Shake detection (accelerometer)
-* Volume button detection
-* Background service implementation
-* Secret dial code detection
+* Implement shake detection using Sensors API
+* Implement volume button trigger detection
+* Implement secret dial code detection
+* Develop background and foreground services
 
-### Skills Needed:
+### Key Java Classes:
 
-* Android lifecycle
-* Sensors API
-* Broadcast receivers
+* `ShakeDetector.java`
+* `VolumeButtonReceiver.java`
+* `DialCodeReceiver.java`
+* `BackgroundService.java`
 
 ---
 
-## 👤 **Member 2: Communication & Emergency Module**
+## 👤 Member 2: Communication & Emergency Module Developer
 
 ### Responsibilities:
 
-* SMS sending system
-* Auto calling feature
-* Contact management system
-* Permissions handling
+* SMS sending functionality
+* Automatic calling system
+* Emergency contact management
+* Runtime permissions handling
 
-### Skills Needed:
+### Key Java Classes:
 
-* Telephony APIs
-* SMS Manager
-* Runtime permissions
+* `SmsSender.java`
+* `CallHandler.java`
+* `EmergencyManager.java`
+* `ContactManager.java`
 
 ---
 
-## 👤 **Member 3: Location & Backend Developer**
+## 👤 Member 3: Location & Backend Developer
 
 ### Responsibilities:
 
 * GPS location tracking
-* Google Maps integration
-* Firebase backend setup
-* Nearby alert system (core logic)
+* Google Maps link generation
+* Firebase integration
+* Nearby alert system logic
 
-### Skills Needed:
+### Key Java Classes:
 
-* Firebase
-* APIs
-* Networking
+* `LocationService.java`
+* `MapsUtils.java`
+* `FirebaseHelper.java`
+* `NearbyAlertService.java`
 
 ---
 
-## 👤 **Member 4: UI/UX + Voice System Developer**
+## 👤 Member 4: UI/UX & Voice System Developer
 
 ### Responsibilities:
 
-* App UI design (modern + clean)
-* Voice recognition system
-* Fake calculator screen (stealth UI)
+* UI design using XML
+* Voice recognition feature
+* Fake calculator interface
 * User onboarding flow
 
-### Skills Needed:
+### Key Java Classes:
 
-* XML/UI design
-* Speech recognition
-* UX thinking
+* `MainActivity.java`
+* `FakeCalculatorActivity.java`
+* `VoiceTriggerService.java`
 
 ---
 
-# 🗂️ Suggested Folder Structure
+# 🗂️ Suggested Project Structure (Java)
 
 ```
 Alertify/
@@ -305,46 +334,46 @@ Alertify/
 │   │   │   └── viewmodels/
 │   │   │
 │   │   ├── triggers/
-│   │   │   ├── ShakeDetector.kt
-│   │   │   ├── VolumeButtonReceiver.kt
-│   │   │   ├── VoiceTriggerService.kt
-│   │   │   └── DialCodeReceiver.kt
+│   │   │   ├── ShakeDetector.java
+│   │   │   ├── VolumeButtonReceiver.java
+│   │   │   ├── VoiceTriggerService.java
+│   │   │   └── DialCodeReceiver.java
 │   │   │
 │   │   ├── emergency/
-│   │   │   ├── EmergencyManager.kt
-│   │   │   ├── SmsSender.kt
-│   │   │   ├── CallHandler.kt
-│   │   │   └── AlertDispatcher.kt
+│   │   │   ├── EmergencyManager.java
+│   │   │   ├── SmsSender.java
+│   │   │   ├── CallHandler.java
+│   │   │   └── AlertDispatcher.java
 │   │   │
 │   │   ├── location/
-│   │   │   ├── LocationService.kt
-│   │   │   ├── LocationHelper.kt
-│   │   │   └── MapsUtils.kt
+│   │   │   ├── LocationService.java
+│   │   │   ├── LocationHelper.java
+│   │   │   └── MapsUtils.java
 │   │   │
 │   │   ├── contacts/
-│   │   │   ├── ContactModel.kt
-│   │   │   ├── ContactRepository.kt
-│   │   │   └── ContactManager.kt
+│   │   │   ├── ContactModel.java
+│   │   │   ├── ContactRepository.java
+│   │   │   └── ContactManager.java
 │   │   │
 │   │   ├── nearby/
-│   │   │   ├── NearbyAlertService.kt
-│   │   │   ├── FirebaseHelper.kt
-│   │   │   └── AlertListener.kt
+│   │   │   ├── NearbyAlertService.java
+│   │   │   ├── FirebaseHelper.java
+│   │   │   └── AlertListener.java
 │   │   │
 │   │   ├── services/
-│   │   │   ├── BackgroundService.kt
-│   │   │   └── ForegroundService.kt
+│   │   │   ├── BackgroundService.java
+│   │   │   └── ForegroundService.java
 │   │   │
 │   │   ├── stealth/
-│   │   │   ├── FakeCalculatorActivity.kt
-│   │   │   └── StealthManager.kt
+│   │   │   ├── FakeCalculatorActivity.java
+│   │   │   └── StealthManager.java
 │   │   │
 │   │   ├── utils/
-│   │   │   ├── Constants.kt
-│   │   │   ├── PermissionUtils.kt
-│   │   │   └── Logger.kt
+│   │   │   ├── Constants.java
+│   │   │   ├── PermissionUtils.java
+│   │   │   └── Logger.java
 │   │   │
-│   │   └── MainActivity.kt
+│   │   └── MainApplication.java
 │   │
 │   ├── res/
 │   │   ├── layout/
@@ -354,5 +383,3 @@ Alertify/
 │   │
 │   └── Gradle Scripts
 ```
-
----
