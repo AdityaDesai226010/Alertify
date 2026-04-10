@@ -8,11 +8,24 @@
     <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.CALL" />
+            <data android:scheme="tel" />
+        </intent>
+    </queries>
 
     <application
         android:allowBackup="true"
@@ -25,6 +38,10 @@
         android:theme="@style/Theme.Alertify"
         android:extractNativeLibs="true"
         tools:targetApi="31">
+        
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCy1azmOW7qI7y_WcRESY4Q7K89iabFVMI" />
         
         <activity
             android:name=".ui.activities.OnboardingActivity"
@@ -43,6 +60,11 @@
             android:name=".ui.activities.MainActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.activities.SafeZoneActivity"
+            android:label="Set Home Location"
+            android:exported="false" />
+
         <service
             android:name=".services.BackgroundService"
             android:enabled="true"
@@ -50,19 +72,7 @@
             android:foregroundServiceType="location|microphone" />
 
 
-        <service
-            android:name=".triggers.VolumeButtonService"
-            android:label="@string/accessibility_service_label"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.view.accessibility.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.view.accessibility.AccessibilityService"
-                android:resource="@xml/accessibility_service_config" />
-        </service>
+
 
         <receiver android:name=".services.BootReceiver"
             android:exported="false">
@@ -74,6 +84,14 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.NEW_OUTGOING_CALL" />
+            </intent-filter>
+        </receiver>
+
+        <receiver android:name=".services.ConfirmationReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.alertify.ACTION_YES" />
+                <action android:name="com.alertify.ACTION_NO" />
             </intent-filter>
         </receiver>
 

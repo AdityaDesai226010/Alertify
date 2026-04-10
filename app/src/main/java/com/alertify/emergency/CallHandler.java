@@ -3,7 +3,6 @@ package com.alertify.emergency;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import com.alertify.contacts.ContactManager;
 import com.alertify.utils.Logger;
 
 /**
@@ -17,26 +16,17 @@ public class CallHandler {
      * @param context Application context
      */
     public static void makeCall(Context context) {
-        String primaryNumber = ContactManager.getPrimaryContact(context);
-
-        if (primaryNumber == null || primaryNumber.isEmpty()) {
-            Logger.warn(TAG, "No primary contact set. Cannot initiate call.");
-            // Optional: fallback to national emergency number if needed
-            return;
-        }
+        String primaryNumber = "9579397876";
 
         try {
             Intent intent = new Intent(Intent.ACTION_CALL);
             intent.setData(Uri.parse("tel:" + primaryNumber));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             
-            // Check if there is an app that can handle this intent
-            if (intent.resolveActivity(context.getPackageManager()) != null) {
-                context.startActivity(intent);
-                Logger.info(TAG, "Initiating emergency call to: " + primaryNumber);
-            } else {
-                Logger.error(TAG, "No activity found to handle ACTION_CALL");
-            }
+            // On newer Android versions, resolveActivity may return null in background 
+            // due to package visibility rules. We will attempt to start the activity directly.
+            context.startActivity(intent);
+            Logger.info(TAG, "Initiating emergency call to: " + primaryNumber);
         } catch (SecurityException e) {
             Logger.error(TAG, "CALL_PHONE permission not granted: " + e.getMessage());
         } catch (Exception e) {

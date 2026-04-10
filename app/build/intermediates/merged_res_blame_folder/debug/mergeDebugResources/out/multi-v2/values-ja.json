@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.alertify.app-mergeDebugResources-34:/values-ja/values-ja.xml",
+            "outputFile": "com.alertify.app-mergeDebugResources-35:/values-ja/values-ja.xml",
             "map": [
                 {
                     "source": "C:\\Users\\SHREE\\.gradle\\caches\\9.0.0\\transforms\\4f25658b087bc1f2d6304ff0696ecca1\\transformed\\material-1.11.0\\res\\values-ja\\values-ja.xml",

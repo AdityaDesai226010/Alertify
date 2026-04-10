@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="accent_blue">#2196F3</color>
     <color name="black">#FF000000</color>
+    <color name="gray_light">#BDBDBD</color>
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
     <color name="purple_700">#FF3700B3</color>
     <color name="red_emergency">#D32F2F</color>
+    <color name="success_green">#4CAF50</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="white">#FFFFFFFF</color>
-    <string name="accessibility_description">Required to detect volume button presses for emergency alerts even when the screen is off.</string>
-    <string name="accessibility_service_label">Alertify Volume Trigger</string>
     <string name="app_name">Alertify</string>
     <string name="btn_test_trigger">Test Trigger</string>
     <string name="emergency_status_idle">Status: Idle</string>

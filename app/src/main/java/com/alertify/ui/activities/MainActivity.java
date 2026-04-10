@@ -12,8 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import com.alertify.utils.Constants;
-import com.alertify.triggers.VolumeButtonService;
 import android.provider.Settings;
+import android.net.Uri;
 import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.content.BroadcastReceiver;
@@ -57,14 +57,27 @@ public class MainActivity extends AppCompatActivity {
 
         Button addContactButton = findViewById(R.id.addContactButton);
         Button testButton = findViewById(R.id.testTriggerButton);
-        Button btnEnableAccessibility = findViewById(R.id.btnEnableAccessibility);
+        Button btnSafeZone = findViewById(R.id.btnSafeZone);
+        Button btnOverlayPermission = findViewById(R.id.btnOverlayPermission);
+
+        btnOverlayPermission.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.canDrawOverlays(this)) {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + getPackageName()));
+                    startActivity(intent);
+                    Toast.makeText(this, "Enable 'Draw over other apps' to allow background calls", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(this, "Overlay permission already granted", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         refreshContactsList();
 
-        btnEnableAccessibility.setOnClickListener(v -> {
-            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+        btnSafeZone.setOnClickListener(v -> {
+            Intent intent = new Intent(this, SafeZoneActivity.class);
             startActivity(intent);
-            Toast.makeText(this, "Scroll down to 'Downloaded apps' or 'Installed services' to find 'Alertify Volume Trigger' and turn it ON", Toast.LENGTH_LONG).show();
         });
 
         addContactButton.setOnClickListener(v -> {
@@ -88,34 +101,28 @@ public class MainActivity extends AppCompatActivity {
             requestPermissions();
         }
 
-        updateAccessibilityStatus();
+        updateSafeZoneStatusDisplay();
     }
 
-    private void updateAccessibilityStatus() {
-        Button btnEnableAccessibility = findViewById(R.id.btnEnableAccessibility);
-        if (isAccessibilityServiceEnabled(this, VolumeButtonService.class)) {
-            btnEnableAccessibility.setText("Volume Trigger: ENABLED ✅");
-            btnEnableAccessibility.setEnabled(false); // Already enabled
-            btnEnableAccessibility.setAlpha(0.6f);
+    private void updateSafeZoneStatusDisplay() {
+        TextView safeZoneStatusText = findViewById(R.id.safeZoneStatusText);
+        if (com.alertify.location.SafeZoneManager.isCurrentlySafe(this)) {
+            safeZoneStatusText.setVisibility(View.VISIBLE);
+            safeZoneStatusText.setText("📍 Safe Zone: ACTIVE (Home)");
+            safeZoneStatusText.setTextColor(ContextCompat.getColor(this, R.color.success_green));
+        } else if (com.alertify.location.SafeZoneManager.isSafeZoneEnabled(this)) {
+            safeZoneStatusText.setVisibility(View.VISIBLE);
+            safeZoneStatusText.setText("📍 Safe Zone: Enabled (Away)");
+            safeZoneStatusText.setTextColor(ContextCompat.getColor(this, R.color.gray_light));
         } else {
-            btnEnableAccessibility.setText("Enable Volume Button Trigger");
-            btnEnableAccessibility.setEnabled(true);
-            btnEnableAccessibility.setAlpha(1.0f);
+            safeZoneStatusText.setVisibility(View.GONE);
         }
-    }
-
-    private boolean isAccessibilityServiceEnabled(Context context, Class<?> service) {
-        String prefString = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
-        if (prefString != null) {
-            return prefString.contains(context.getPackageName() + "/" + service.getName());
-        }
-        return false;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        updateAccessibilityStatus(); // Re-check when returning from settings
+        updateSafeZoneStatusDisplay();
     }
 
     private boolean checkPermissions() {
@@ -138,39 +145,77 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
         return true;
     }
 
     private void requestPermissions() {
-        String[] permissions;
+        java.util.List<String> permissions = new java.util.ArrayList<>();
+        permissions.add(Manifest.permission.SEND_SMS);
+        permissions.add(Manifest.permission.CALL_PHONE);
+        permissions.add(Manifest.permission.RECORD_AUDIO);
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissions = new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.SEND_SMS,
-                    Manifest.permission.CALL_PHONE,
-                    Manifest.permission.RECORD_AUDIO,
-                    Manifest.permission.POST_NOTIFICATIONS
-            };
-        } else {
-            permissions = new String[]{
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.SEND_SMS,
-                    Manifest.permission.CALL_PHONE,
-                    Manifest.permission.RECORD_AUDIO
-            };
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS);
         }
-        ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
+
+        java.util.List<String> missingPermissions = new java.util.ArrayList<>();
+        for (String p : permissions) {
+            if (ContextCompat.checkSelfPermission(this, p) != PackageManager.PERMISSION_GRANTED) {
+                missingPermissions.add(p);
+            }
+        }
+
+        if (!missingPermissions.isEmpty()) {
+            ActivityCompat.requestPermissions(this, missingPermissions.toArray(new String[0]), PERMISSION_REQUEST_CODE);
+        } else {
+            // Foreground granted, check background
+            requestBackgroundLocationPermission();
+        }
+    }
+
+    private void requestBackgroundLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // Background location must be requested AFTER foreground location
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                    Toast.makeText(this, "Safe Zone requires 'Allow all the time' location permission. Please enable it in settings.", Toast.LENGTH_LONG).show();
+                }
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_BACKGROUND_LOCATION}, PERMISSION_REQUEST_CODE + 1);
+            } else {
+                startService();
+            }
+        } else {
+            startService();
+        }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startService();
+            boolean allGranted = true;
+            for (int res : grantResults) {
+                if (res != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+
+            if (allGranted) {
+                requestBackgroundLocationPermission();
             } else {
                 Toast.makeText(this, "Permissions are required for the app to function.", Toast.LENGTH_LONG).show();
             }
+        } else if (requestCode == PERMISSION_REQUEST_CODE + 1) {
+            // Background location result
+            startService();
         }
     }
 

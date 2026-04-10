@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.alertify.app-mergeDebugResources-34:/values-mr/values-mr.xml",
+            "outputFile": "com.alertify.app-mergeDebugResources-35:/values-mr/values-mr.xml",
             "map": [
                 {
                     "source": "C:\\Users\\SHREE\\.gradle\\caches\\9.0.0\\transforms\\9b3db7319c6ae07b26abec38b3a772a1\\transformed\\jetified-play-services-base-18.1.0\\res\\values-mr\\values.xml",

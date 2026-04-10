@@ -10,6 +10,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import com.alertify.triggers.ShakeDetector;
@@ -21,6 +22,15 @@ import org.vosk.android.StorageService;
 import org.vosk.android.RecognitionListener;
 import android.os.Vibrator;
 import android.os.VibrationEffect;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+import com.alertify.location.SafeZoneManager;
+import com.alertify.utils.Constants;
+import android.os.PowerManager;
 
 public class BackgroundService extends Service implements RecognitionListener {
 
@@ -36,6 +46,9 @@ public class BackgroundService extends Service implements RecognitionListener {
     private Model model;
     private SpeechService speechService;
     private Vibrator vibrator;
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private PowerManager.WakeLock wakeLock;
     private static final String CHANNEL_ID = "AlertifyBackgroundChannel";
 
     @Override
@@ -49,6 +62,12 @@ public class BackgroundService extends Service implements RecognitionListener {
         }
 
         createNotificationChannel();
+        
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        if (powerManager != null) {
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Alertify:BackgroundServiceWakeLock");
+            wakeLock.acquire();
+        }
         
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Alertify Active")
@@ -66,6 +85,8 @@ public class BackgroundService extends Service implements RecognitionListener {
         if (accelerometer != null) {
             sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         }
+
+        setupLocationMonitoring();
 
         // Delay initialization by 1.5s to give MainActivity time to register its UI receiver
         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(this::initializeVosk, 1500);
@@ -158,13 +179,46 @@ public class BackgroundService extends Service implements RecognitionListener {
             
             if (text.contains("help me") || partial.contains("help me")) {
                 android.util.Log.d("Vosk", "Emergency Triggered by Voice!");
-                EmergencyManager.triggerEmergency(this);
+                triggerIfSafe();
             }
         } catch (org.json.JSONException e) {
             // Fallback for raw string check
             if (json.toLowerCase().contains("help me")) {
-                EmergencyManager.triggerEmergency(this);
+                triggerIfSafe();
             }
+        }
+    }
+
+    private void triggerIfSafe() {
+        if (SafeZoneManager.isCurrentlySafe(this)) {
+            android.util.Log.d("SafeZone", "Trigger blocked by Safe Zone!");
+            return;
+        }
+        EmergencyManager.triggerEmergency(this);
+    }
+
+    private void setupLocationMonitoring() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60000) // 1 minute
+                .setMinUpdateIntervalMillis(30000) // 30 seconds
+                .build();
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                if (locationResult.getLastLocation() != null) {
+                    double lat = locationResult.getLastLocation().getLatitude();
+                    double lng = locationResult.getLastLocation().getLongitude();
+                    SafeZoneManager.updateSafeStatus(BackgroundService.this, lat, lng);
+                }
+            }
+        };
+
+        try {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+        } catch (SecurityException e) {
+            android.util.Log.e("BackgroundService", "Location permission missing for safe zone monitoring");
         }
     }
 
@@ -183,7 +237,7 @@ public class BackgroundService extends Service implements RecognitionListener {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Alertify Background Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
@@ -218,6 +272,12 @@ public class BackgroundService extends Service implements RecognitionListener {
         if (speechService != null) {
             speechService.stop();
             speechService.shutdown();
+        }
+        if (fusedLocationClient != null && locationCallback != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
         }
     }
 
