@@ -141,7 +141,7 @@ Time: [timestamp]
 
 ### 📱 Frontend
 
-* Android (Kotlin + XML)
+* Android (java + XML)
 
 ### ⚙️ Backend
 
