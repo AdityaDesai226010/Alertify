@@ -14,7 +14,7 @@ public class EmergencyManager {
         // 1. Fetch Location
         LocationHelper.fetchLocation(context, new LocationHelper.LocationCallback() {
             @Override
-            public void onLocationResult(String locationLink) {
+            public void onLocationResult(double lat, double lng, String locationLink) {
                 Log.d(TAG, "Location Link: " + locationLink);
 
                 // 2. Send SMS to all emergency contacts
@@ -23,8 +23,8 @@ public class EmergencyManager {
                 // 3. Make Automated Call to primary contact
                 CallHandler.makeCall(context);
 
-                // 4. Notify Nearby Users (Implementation depends on Firebase)
-                Log.d(TAG, "Notifying nearby users...");
+                // 4. Notify Nearby Users using Firebase
+                com.alertify.nearby.NearbyAlertService.sendAlert(context, lat, lng, locationLink);
             }
 
             @Override

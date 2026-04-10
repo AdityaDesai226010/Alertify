@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "468185957426",
+    "project_id": "alertify-e1bf4",
+    "storage_bucket": "alertify-e1bf4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:468185957426:android:3ed4d73b3c6dfe7e26a82b",
+        "android_client_info": {
+          "package_name": "com.alertify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsPcqU49jJ50vXvHQtMp-RGN7dtWzJIjg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
