@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-debug-33:\\drawable_ic_security.xml.flat",
+        "source": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-main-35:\\drawable\\ic_security.xml"
+    },
+    {
+        "merged": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-debug-33:\\xml_backup_rules.xml.flat",
+        "source": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-main-35:\\xml\\backup_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-debug-33:\\xml_data_extraction_rules.xml.flat",
+        "source": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-main-35:\\xml\\data_extraction_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-debug-33:\\layout_activity_onboarding.xml.flat",
+        "source": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-main-35:\\layout\\activity_onboarding.xml"
+    },
+    {
+        "merged": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-debug-33:\\xml_accessibility_service_config.xml.flat",
+        "source": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-main-35:\\xml\\accessibility_service_config.xml"
+    },
+    {
+        "merged": "com.alertify.app-debug-33:/layout_activity_main.xml.flat",
+        "source": "com.alertify.app-main-35:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.alertify.app-debug-33:/layout_activity_fake_calculator.xml.flat",
+        "source": "com.alertify.app-main-35:/layout/activity_fake_calculator.xml"
+    },
+    {
+        "merged": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-debug-33:\\layout_activity_main.xml.flat",
+        "source": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-main-35:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-debug-33:\\layout_activity_fake_calculator.xml.flat",
+        "source": "C:\\Users\\SHREE\\.gradle\\daemon\\9.0.0\\com.alertify.app-main-35:\\layout\\activity_fake_calculator.xml"
+    }
+]
