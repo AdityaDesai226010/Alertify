@@ -11,7 +11,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import com.alertify.utils.Constants;
+import com.alertify.triggers.VolumeButtonService;
+import android.provider.Settings;
 import androidx.core.content.ContextCompat;
+import android.text.TextUtils;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -26,6 +30,7 @@ import android.widget.EditText;
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
+
     private TextView statusTextView;
     private TextView contactsListTextView;
     private EditText contactEditText;
@@ -82,6 +87,35 @@ public class MainActivity extends AppCompatActivity {
         } else {
             requestPermissions();
         }
+
+        updateAccessibilityStatus();
+    }
+
+    private void updateAccessibilityStatus() {
+        Button btnEnableAccessibility = findViewById(R.id.btnEnableAccessibility);
+        if (isAccessibilityServiceEnabled(this, VolumeButtonService.class)) {
+            btnEnableAccessibility.setText("Volume Trigger: ENABLED ✅");
+            btnEnableAccessibility.setEnabled(false); // Already enabled
+            btnEnableAccessibility.setAlpha(0.6f);
+        } else {
+            btnEnableAccessibility.setText("Enable Volume Button Trigger");
+            btnEnableAccessibility.setEnabled(true);
+            btnEnableAccessibility.setAlpha(1.0f);
+        }
+    }
+
+    private boolean isAccessibilityServiceEnabled(Context context, Class<?> service) {
+        String prefString = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
+        if (prefString != null) {
+            return prefString.contains(context.getPackageName() + "/" + service.getName());
+        }
+        return false;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateAccessibilityStatus(); // Re-check when returning from settings
     }
 
     private boolean checkPermissions() {

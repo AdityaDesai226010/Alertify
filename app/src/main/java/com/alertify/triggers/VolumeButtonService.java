@@ -11,37 +11,53 @@ public class VolumeButtonService extends AccessibilityService {
     private static final String TAG = "VolumeButtonService";
     private int count = 0;
     private long lastPressTime = 0;
-    private int lastKeyCode = -1;
-    private static final int PRESS_THRESHOLD = 3;
-    private static final int TIME_WINDOW = 3000;
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
+        int action = event.getAction();
+
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
+            if (action == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
                 long currentTime = System.currentTimeMillis();
 
-                // Check if it's the same button and within the time window
-                if (keyCode == lastKeyCode && (currentTime - lastPressTime < TIME_WINDOW)) {
-                    count++;
-                } else {
-                    count = 1; // Start a new sequence
+                // If window expired, reset count
+                if (currentTime - lastPressTime > com.alertify.utils.Constants.VOLUME_TIME_WINDOW) {
+                    count = 0;
                 }
 
+                count++;
                 lastPressTime = currentTime;
-                lastKeyCode = keyCode;
 
-                if (count >= PRESS_THRESHOLD) {
-                    Log.d(TAG, "Volume Trigger Detected: " + (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ? "Down" : "Up") + " pressed 3 times.");
+                // Provide haptic feedback for each press so the user knows it's registered
+                vibrate(100);
+
+                Log.d(TAG, "Volume press count: " + count + " (Key: " + (keyCode == KeyEvent.KEYCODE_VOLUME_UP ? "UP" : "DOWN") + ")");
+
+                if (count >= com.alertify.utils.Constants.VOLUME_PRESS_THRESHOLD) {
+                    Log.d(TAG, "Volume Trigger DETECTED! Threshold reached.");
                     EmergencyManager.triggerEmergency(this);
-                    count = 0;
-                    lastKeyCode = -1;
+                    count = 0; // Reset after trigger
+                    // Extra long vibration to confirm trigger
+                    vibrate(500);
                 }
             }
-            return false;
+            // Return true to consume the event so volume doesn't actually change
+            // This makes it "silent" and prevents the volume dialog from popping up constantly
+            return true;
         }
         return super.onKeyEvent(event);
+    }
+
+    private void vibrate(long duration) {
+        android.os.Vibrator v = (android.os.Vibrator) getSystemService(VIBRATOR_SERVICE);
+        if (v != null && v.hasVibrator()) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                v.vibrate(android.os.VibrationEffect.createOneShot(duration, android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                v.vibrate(duration);
+            }
+        }
     }
 
     @Override
