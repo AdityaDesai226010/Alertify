@@ -12,22 +12,65 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
+import android.view.View;
+import android.widget.ProgressBar;
 import com.alertify.R;
 import com.alertify.emergency.EmergencyManager;
 import com.alertify.services.BackgroundService;
+import com.alertify.contacts.ContactManager;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int PERMISSION_REQUEST_CODE = 100;
     private TextView statusTextView;
+    private TextView contactsListTextView;
+    private EditText contactEditText;
+    private TextView modelStatusTextView;
+    private ProgressBar modelProgressBar;
 
+    private final BroadcastReceiver statusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int status = intent.getIntExtra(BackgroundService.EXTRA_STATUS, -1);
+            updateModelUI(status);
+        }
+    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         statusTextView = findViewById(R.id.statusTextView);
+        contactsListTextView = findViewById(R.id.contactsListTextView);
+        contactEditText = findViewById(R.id.contactEditText);
+        modelStatusTextView = findViewById(R.id.modelStatusTextView);
+        modelProgressBar = findViewById(R.id.modelProgressBar);
+
+        Button addContactButton = findViewById(R.id.addContactButton);
         Button testButton = findViewById(R.id.testTriggerButton);
+        Button btnEnableAccessibility = findViewById(R.id.btnEnableAccessibility);
+
+        refreshContactsList();
+
+        btnEnableAccessibility.setOnClickListener(v -> {
+            Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
+            startActivity(intent);
+            Toast.makeText(this, "Scroll down to 'Downloaded apps' or 'Installed services' to find 'Alertify Volume Trigger' and turn it ON", Toast.LENGTH_LONG).show();
+        });
+
+        addContactButton.setOnClickListener(v -> {
+            String phone = contactEditText.getText().toString().trim();
+            if (!phone.isEmpty()) {
+                ContactManager.addContact(this, phone);
+                contactEditText.setText("");
+                refreshContactsList();
+                Toast.makeText(this, "Contact Added", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         testButton.setOnClickListener(v -> {
             EmergencyManager.triggerEmergency(this);
@@ -45,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
         String[] permissions = {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.SEND_SMS,
-                Manifest.permission.CALL_PHONE
+                Manifest.permission.CALL_PHONE,
+                Manifest.permission.RECORD_AUDIO
         };
 
         for (String permission : permissions) {
@@ -70,13 +114,15 @@ public class MainActivity extends AppCompatActivity {
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.SEND_SMS,
                     Manifest.permission.CALL_PHONE,
+                    Manifest.permission.RECORD_AUDIO,
                     Manifest.permission.POST_NOTIFICATIONS
             };
         } else {
             permissions = new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.SEND_SMS,
-                    Manifest.permission.CALL_PHONE
+                    Manifest.permission.CALL_PHONE,
+                    Manifest.permission.RECORD_AUDIO
             };
         }
         ActivityCompat.requestPermissions(this, permissions, PERMISSION_REQUEST_CODE);
@@ -95,12 +141,63 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startService() {
-        Intent serviceIntent = new Intent(this, BackgroundService.class);
+        Intent backgroundIntent = new Intent(this, BackgroundService.class);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
+            startForegroundService(backgroundIntent);
         } else {
-            startService(serviceIntent);
+            startService(backgroundIntent);
         }
         statusTextView.setText(R.string.emergency_status_idle);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(BackgroundService.ACTION_VOSK_STATUS);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(statusReceiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            registerReceiver(statusReceiver, filter);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(statusReceiver);
+    }
+
+    private void updateModelUI(int status) {
+        switch (status) {
+            case BackgroundService.STATUS_LOADING:
+                modelProgressBar.setVisibility(View.VISIBLE);
+                modelStatusTextView.setText("Voice Module: Loading...");
+                modelStatusTextView.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+                break;
+            case BackgroundService.STATUS_READY:
+                modelProgressBar.setVisibility(View.GONE);
+                modelStatusTextView.setText("Voice Module: Ready ✅");
+                modelStatusTextView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_light));
+                break;
+            case BackgroundService.STATUS_ERROR:
+                modelProgressBar.setVisibility(View.GONE);
+                modelStatusTextView.setText("Voice Module: Error ❌");
+                modelStatusTextView.setTextColor(ContextCompat.getColor(this, android.R.color.holo_red_light));
+                break;
+        }
+    }
+
+    private void refreshContactsList() {
+        java.util.List<String> contacts = ContactManager.getContacts(this);
+        if (contacts.isEmpty()) {
+            contactsListTextView.setText("No contacts added yet.");
+        } else {
+            StringBuilder sb = new StringBuilder("Active Project Contacts:\n");
+            for (String c : contacts) {
+                sb.append("• ").append(c).append("\n");
+            }
+            contactsListTextView.setText(sb.toString());
+        }
     }
 }

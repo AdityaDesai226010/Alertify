@@ -12,11 +12,6 @@ import java.util.List;
 public class SmsSender {
     private static final String TAG = "SmsSender";
 
-    /**
-     * Sends emergency SMS with location to all contacts.
-     * @param context Application context
-     * @param locationLink Google Maps link with current location
-     */
     public static void sendSMS(Context context, String locationLink) {
         List<String> contacts = ContactManager.getContacts(context);
         
@@ -25,10 +20,21 @@ public class SmsSender {
             return;
         }
 
-        String message = "EMERGENCY! I need help. My current location: " + locationLink;
+        String message;
+        if (locationLink != null && !locationLink.isEmpty() && !locationLink.equals("Location unavailable")) {
+            message = "EMERGENCY! I need help. My current location: " + locationLink;
+        } else {
+            message = "EMERGENCY! I need help. My location is being acquired...";
+        }
         
         try {
-            SmsManager smsManager = SmsManager.getDefault();
+            SmsManager smsManager;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                smsManager = context.getSystemService(SmsManager.class);
+            } else {
+                smsManager = SmsManager.getDefault();
+            }
+
             for (String number : contacts) {
                 if (number != null && !number.isEmpty()) {
                     smsManager.sendTextMessage(number, null, message, null, null);

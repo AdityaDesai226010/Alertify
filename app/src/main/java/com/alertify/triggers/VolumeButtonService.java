@@ -11,31 +11,34 @@ public class VolumeButtonService extends AccessibilityService {
     private static final String TAG = "VolumeButtonService";
     private int count = 0;
     private long lastPressTime = 0;
+    private int lastKeyCode = -1;
     private static final int PRESS_THRESHOLD = 3;
-    private static final int TIME_WINDOW = 2000;
+    private static final int TIME_WINDOW = 3000;
 
     @Override
     protected boolean onKeyEvent(KeyEvent event) {
         int keyCode = event.getKeyCode();
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getRepeatCount() == 0) {
                 long currentTime = System.currentTimeMillis();
 
-                if (currentTime - lastPressTime < TIME_WINDOW) {
+                // Check if it's the same button and within the time window
+                if (keyCode == lastKeyCode && (currentTime - lastPressTime < TIME_WINDOW)) {
                     count++;
                 } else {
-                    count = 1;
+                    count = 1; // Start a new sequence
                 }
 
                 lastPressTime = currentTime;
+                lastKeyCode = keyCode;
 
                 if (count >= PRESS_THRESHOLD) {
-                    Log.d(TAG, "Volume Trigger Detected via Accessibility!");
+                    Log.d(TAG, "Volume Trigger Detected: " + (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ? "Down" : "Up") + " pressed 3 times.");
                     EmergencyManager.triggerEmergency(this);
                     count = 0;
+                    lastKeyCode = -1;
                 }
             }
-            // Return false to allow the system to still handle the volume change
             return false;
         }
         return super.onKeyEvent(event);

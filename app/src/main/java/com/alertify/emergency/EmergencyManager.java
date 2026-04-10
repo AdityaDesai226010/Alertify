@@ -15,13 +15,20 @@ public class EmergencyManager {
     public static void triggerEmergency(Context context) {
         Logger.info(TAG, "!!! EMERGENCY TRIGGERED !!!");
 
-        // 0. Provide immediate physical feedback
+        // 0. Provide immediate physical/visual feedback
         vibrate(context);
+        com.alertify.utils.NotificationHelper.showNearbyAlertNotification(context, 
+            "EMERGENCY ACTIVATED", 
+            "Alertify is sending alerts and calling your contact.", 
+            "https://maps.google.com");
 
-        // 1. Initiate call immediately (does not need location)
+        // 1. Send an immediate "Signal Received" SMS (Pre-location)
+        SmsSender.sendSMS(context, null);
+
+        // 2. Initiate call immediately
         CallHandler.makeCall(context);
 
-        // 2. Fetch location and proceed with other alerts
+        // 3. Fetch location and proceed with detailed alerts
         LocationHelper.fetchLocation(context, new LocationHelper.LocationCallback() {
             @Override
             public void onLocationResult(double lat, double lng, String locationLink) {
