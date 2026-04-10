@@ -45,9 +45,32 @@
             android:enabled="true"
             android:exported="false" />
 
+<<<<<<< HEAD
         <receiver android:name=".triggers.VolumeButtonReceiver"
             android:enabled="true"
             android:exported="true" />
+=======
+        <service
+            android:name=".triggers.VolumeButtonService"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.view.accessibility.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.view.accessibility.AccessibilityService"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <receiver android:name=".services.BootReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+>>>>>>> 558aef2b815a33d2b2c72a28f2dba9b2a6171b16
         <receiver android:name=".triggers.DialCodeReceiver"
             android:exported="true">
             <intent-filter>

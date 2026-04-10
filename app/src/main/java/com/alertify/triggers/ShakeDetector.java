@@ -9,13 +9,21 @@ import com.alertify.emergency.EmergencyManager;
 
 public class ShakeDetector implements SensorEventListener {
 
-    private static final float SHAKE_THRESHOLD = 12.0f;
-    private static final int SHAKE_TIME_LAPSE = 1000;
-    private long lastShakeTime = 0;
+    private static final int SHAKE_SLOP_TIME_MS = 500;
+    private static final int SHAKE_COUNT_RESET_TIME_MS = 3000;
+
+    private float shakeThreshold = 12.0f;
+    private long lastShakeTimestamp;
+    private int shakeCount;
     private Context context;
 
     public ShakeDetector(Context context) {
         this.context = context;
+        // Sensitivity could be fetched from SharedPreferences here
+    }
+
+    public void setSensitivity(float threshold) {
+        this.shakeThreshold = threshold;
     }
 
     @Override
@@ -24,15 +32,30 @@ public class ShakeDetector implements SensorEventListener {
         float y = event.values[1];
         float z = event.values[2];
 
-        float acceleration = (float) Math.sqrt(x*x + y*y + z*z);
+        float gX = x / SensorManager.GRAVITY_EARTH;
+        float gY = y / SensorManager.GRAVITY_EARTH;
+        float gZ = z / SensorManager.GRAVITY_EARTH;
 
-        if (acceleration > SHAKE_THRESHOLD) {
-            long currentTime = System.currentTimeMillis();
+        // gForce will be close to 1 when there is no movement.
+        float gForce = (float) Math.sqrt(gX * gX + gY * gY + gZ * gZ);
 
-            if (currentTime - lastShakeTime > SHAKE_TIME_LAPSE) {
-                lastShakeTime = currentTime;
+        if (gForce > shakeThreshold) {
+            final long now = System.currentTimeMillis();
+            // ignore shake events too close to each other (500ms)
+            if (lastShakeTimestamp + SHAKE_SLOP_TIME_MS > now) {
+                return;
+            }
 
-                // Trigger Emergency
+            // reset the shake count after 3 seconds of no shakes
+            if (lastShakeTimestamp + SHAKE_COUNT_RESET_TIME_MS < now) {
+                shakeCount = 0;
+            }
+
+            lastShakeTimestamp = now;
+            shakeCount++;
+
+            if (shakeCount >= 3) {
+                shakeCount = 0;
                 EmergencyManager.triggerEmergency(context);
             }
         }
