@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Alertify</string>
+    <string name="emergency_status_idle">System is active and monitoring.</string>
+    <string name="emergency_status_triggered">EMERGENCY TRIGGERED!</string>
+    <string name="btn_test_trigger">Test Emergency Trigger</string>
+    <string name="permissions_required">Permissions are required for the app to function correctly.</string>
+</resources>
