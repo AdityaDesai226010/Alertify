@@ -3,47 +3,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="#000000">
+    android:background="#121212"
+    android:padding="16dp">
 
-    <EditText
-        android:id="@+id/calcDisplay"
+    <!-- Calculator Display -->
+    <TextView
+        android:id="@+id/tvDisplay"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:background="#222222"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="bottom|end"
+        android:padding="20dp"
+        android:text="0"
         android:textColor="#FFFFFF"
-        android:textSize="36sp"
-        android:gravity="end|bottom"
-        android:padding="12dp"
-        android:focusable="false"
-        android:clickable="false" />
+        android:textSize="60sp" />
 
+    <!-- Calculator Buttons Grid -->
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:rowCount="4"
         android:columnCount="4"
-        android:layout_marginTop="24dp">
+        android:rowCount="5">
 
-        <Button android:id="@+id/btn7" android:text="7" style="@style/CalcButton" />
-        <Button android:id="@+id/btn8" android:text="8" style="@style/CalcButton" />
-        <Button android:id="@+id/btn9" android:text="9" style="@style/CalcButton" />
-        <Button android:text="/" style="@style/CalcButton" />
+        <!-- Row 1 -->
+        <Button style="@style/CalcButton" android:text="C" android:textColor="#FF9800"/>
+        <Button style="@style/CalcButton" android:text="+/-" />
+        <Button style="@style/CalcButton" android:text="%" />
+        <Button style="@style/CalcButton" android:text="/" android:backgroundTint="#FF9800"/>
 
-        <Button android:id="@+id/btn4" android:text="4" style="@style/CalcButton" />
-        <Button android:id="@+id/btn5" android:text="5" style="@style/CalcButton" />
-        <Button android:id="@+id/btn6" android:text="6" style="@style/CalcButton" />
-        <Button android:text="*" style="@style/CalcButton" />
+        <!-- Row 2 -->
+        <Button style="@style/CalcButton" android:text="7" />
+        <Button style="@style/CalcButton" android:text="8" />
+        <Button style="@style/CalcButton" android:text="9" />
+        <Button style="@style/CalcButton" android:text="*" android:backgroundTint="#FF9800"/>
 
-        <Button android:id="@+id/btn1" android:text="1" style="@style/CalcButton" />
-        <Button android:id="@+id/btn2" android:text="2" style="@style/CalcButton" />
-        <Button android:id="@+id/btn3" android:text="3" style="@style/CalcButton" />
-        <Button android:text="-" style="@style/CalcButton" />
+        <!-- Row 3 -->
+        <Button style="@style/CalcButton" android:text="4" />
+        <Button style="@style/CalcButton" android:text="5" />
+        <Button style="@style/CalcButton" android:text="6" />
+        <Button style="@style/CalcButton" android:text="-" android:backgroundTint="#FF9800"/>
 
-        <Button android:id="@+id/btnClear" android:text="C" style="@style/CalcButton" />
-        <Button android:id="@+id/btn0" android:text="0" style="@style/CalcButton" />
-        <Button android:text="=" style="@style/CalcButton" />
-        <Button android:text="+" style="@style/CalcButton" />
+        <!-- Row 4 -->
+        <Button style="@style/CalcButton" android:text="1" />
+        <Button style="@style/CalcButton" android:text="2" />
+        <Button style="@style/CalcButton" android:text="3" />
+        <Button style="@style/CalcButton" android:text="+" android:backgroundTint="#FF9800"/>
+
+        <!-- Row 5 -->
+        <Button style="@style/CalcButton" android:text="0" android:layout_columnSpan="2" android:layout_width="0dp" android:layout_gravity="fill_horizontal"/>
+        <Button style="@style/CalcButton" android:text="." />
+        <Button style="@style/CalcButton" android:text="=" android:backgroundTint="#FF9800"/>
 
     </GridLayout>
 
