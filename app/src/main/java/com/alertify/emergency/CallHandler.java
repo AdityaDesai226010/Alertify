@@ -3,26 +3,38 @@ package com.alertify.emergency;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
+import com.alertify.contacts.ContactManager;
+import com.alertify.utils.Logger;
 
+/**
+ * Handles initiating emergency calls to the primary contact.
+ */
 public class CallHandler {
-
     private static final String TAG = "CallHandler";
 
+    /**
+     * Makes a call to the primary emergency contact.
+     * @param context Application context
+     */
     public static void makeCall(Context context) {
-        try {
-            // TODO: Fetch primary contact from database/preferences
-            String primaryNumber = "911"; // Default emergency number for demo
+        String primaryNumber = ContactManager.getPrimaryContact(context);
 
+        if (primaryNumber == null || primaryNumber.isEmpty()) {
+            Logger.warn(TAG, "No primary contact set. Cannot initiate call.");
+            // Optional: fallback to national emergency number if needed
+            return;
+        }
+
+        try {
             Intent intent = new Intent(Intent.ACTION_CALL);
             intent.setData(Uri.parse("tel:" + primaryNumber));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
-            Log.d(TAG, "Initiating call to: " + primaryNumber);
+            Logger.info(TAG, "Initiating emergency call to: " + primaryNumber);
         } catch (SecurityException e) {
-            Log.e(TAG, "Call permission not granted", e);
+            Logger.error(TAG, "CALL_PHONE permission not granted: " + e.getMessage());
         } catch (Exception e) {
-            Log.e(TAG, "Failed to initiate call", e);
+            Logger.error(TAG, "Failed to initiate call: " + e.getMessage());
         }
     }
 }
