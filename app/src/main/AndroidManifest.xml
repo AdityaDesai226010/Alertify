@@ -16,15 +16,15 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_security"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_security"
         android:supportsRtl="true"
         android:theme="@style/Theme.Alertify"
         tools:targetApi="31">
         
         <activity
-            android:name=".ui.activities.FakeCalculatorActivity"
+            android:name=".ui.activities.OnboardingActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,11 +33,11 @@
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".stealth.FakeCalculatorActivity"
             android:exported="false" />
 
         <activity
-            android:name=".ui.activities.OnboardingActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="false" />
 
         <service
@@ -45,11 +45,6 @@
             android:enabled="true"
             android:exported="false" />
 
-<<<<<<< HEAD
-        <receiver android:name=".triggers.VolumeButtonReceiver"
-            android:enabled="true"
-            android:exported="true" />
-=======
         <service
             android:name=".triggers.VolumeButtonService"
             android:label="@string/accessibility_service_label"
@@ -69,8 +64,6 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
->>>>>>> 558aef2b815a33d2b2c72a28f2dba9b2a6171b16
         <receiver android:name=".triggers.DialCodeReceiver"
             android:exported="true">
             <intent-filter>

@@ -3,14 +3,14 @@ package com.alertify.stealth;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.alertify.R;
 import com.alertify.ui.activities.MainActivity;
 
 public class FakeCalculatorActivity extends AppCompatActivity {
 
-    private EditText resultDisplay;
+    private TextView resultDisplay;
     private StringBuilder inputBuffer = new StringBuilder();
     private static final String SECRET_PIN = "1234";
 

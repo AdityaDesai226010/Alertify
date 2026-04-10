@@ -5,11 +5,21 @@
     android:background="#121212">
 
     <TextView
+        android:id="@+id/statusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Alertify Main Dashboard"
+        android:text="@string/emergency_status_idle"
         android:textColor="#FFFFFF"
-        android:textSize="24sp"
+        android:textSize="18sp"
         android:layout_centerInParent="true"/>
-        
+
+    <Button
+        android:id="@+id/testTriggerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/statusTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/btn_test_trigger" />
+
 </RelativeLayout>

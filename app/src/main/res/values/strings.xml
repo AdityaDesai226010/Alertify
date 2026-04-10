@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Alertify</string>
-    <string name="emergency_status_idle">System is active and monitoring.</string>
+    <string name="emergency_status_idle">Status: Idle</string>
     <string name="emergency_status_triggered">EMERGENCY TRIGGERED!</string>
-    <string name="btn_test_trigger">Test Emergency Trigger</string>
+    <string name="btn_test_trigger">Test Trigger</string>
     <string name="accessibility_service_label">Alertify Volume Trigger</string>
     <string name="accessibility_description">Required to detect volume button presses for emergency alerts even when the screen is off.</string>
 </resources>

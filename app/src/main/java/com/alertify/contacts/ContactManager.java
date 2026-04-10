@@ -30,7 +30,7 @@ public class ContactManager {
         prefs.edit().putStringSet(KEY_CONTACTS, contacts).apply();
         
         // If no primary contact exists, set this as primary
-        if (getPrimaryContact(context) == null || getPrimaryContact(context).equals("911")) {
+        if (getPrimaryContact(context) == null || getPrimaryContact(context).equals("9356467029")) {
             setPrimaryContact(context, phoneNumber);
         }
         Logger.info(TAG, "Added contact: " + phoneNumber);
@@ -52,7 +52,7 @@ public class ContactManager {
             if (!contacts.isEmpty()) {
                 setPrimaryContact(context, contacts.iterator().next());
             } else {
-                setPrimaryContact(context, "911");
+                setPrimaryContact(context, "9356467029");
             }
         }
         Logger.info(TAG, "Removed contact: " + phoneNumber);
@@ -83,10 +83,10 @@ public class ContactManager {
     /**
      * Retrieves the primary contact for making calls.
      * @param context Application context
-     * @return Primary contact phone number or '911' if none
+     * @return Primary contact phone number or '9356467029' if none
      */
     public static String getPrimaryContact(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        return prefs.getString(KEY_PRIMARY_CONTACT, "911");
+        return prefs.getString(KEY_PRIMARY_CONTACT, "9356467029");
     }
 }

@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import com.alertify.R;
+import com.alertify.stealth.FakeCalculatorActivity;
 
 public class OnboardingActivity extends AppCompatActivity {
 
