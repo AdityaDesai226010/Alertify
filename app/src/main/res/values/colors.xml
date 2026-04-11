@@ -44,4 +44,18 @@
     <color name="outline_variant">#abadaf</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+
+    <!-- Dashboard Status Colors -->
+    <color name="success_green">#00C853</color>
+    <color name="status_active">#00E676</color>
+    <color name="status_ready">#47a6f7</color>
+    <color name="status_standby">#FFC107</color>
+    <color name="gray_light">#9E9E9E</color>
+    <color name="purple_accent">#6C5CE7</color>
+    <color name="accent_blue">#47a6f7</color>
+    <color name="purple_500">#6C5CE7</color>
+
+    <!-- Card Backgrounds -->
+    <color name="card_glass_bg">#CCeef1f3</color>
+    <color name="card_white_bg">#F0ffffff</color>
 </resources>

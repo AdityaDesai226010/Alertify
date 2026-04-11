@@ -2,10 +2,11 @@
     <string name="app_name">Alertify</string>
     <string name="emergency_status_idle">System is active and monitoring.</string>
     <string name="emergency_status_triggered">EMERGENCY TRIGGERED!</string>
-    <string name="btn_test_trigger">Test Emergency Trigger</string>
+    <string name="btn_test_trigger">⚡ Test Emergency Trigger</string>
     <string name="accessibility_service_label">Alertify Volume Trigger</string>
     <string name="accessibility_description">Required to detect volume button presses for emergency alerts even when the screen is off.</string>
-    
+    <string name="accessibility_service_description">Alertify uses accessibility to detect volume button presses for emergency alerts even when the screen is off.</string>
+
     <!-- Design System Strings -->
     <string name="welcome_title">Welcome to Alertify</string>
     <string name="onboarding_desc">Your safety is our priority. Let\'s set up your personal Guardian Protocol triggers.</string>
@@ -15,4 +16,33 @@
     <string name="legal_guide_title">Safety &amp; Legal Guide</string>
     <string name="transition_msg">Establishing Secure Connection...</string>
     <string name="permissions_title">Allow Alertify to access your Google Account?</string>
+
+    <!-- Dashboard Section Titles -->
+    <string name="section_system_status">System Status</string>
+    <string name="section_active_triggers">Active Triggers</string>
+    <string name="section_emergency_response">Emergency Response System</string>
+    <string name="section_controls">Controls</string>
+    <string name="section_contacts">Emergency Contacts</string>
+
+    <!-- System Status Labels -->
+    <string name="status_protection_active">Protection Active</string>
+    <string name="status_background_running">System Running in Background</string>
+    <string name="status_sensors_active">Sensors Active</string>
+
+    <!-- Trigger Labels -->
+    <string name="trigger_voice">Voice Recognition (Offline AI — Vosk)</string>
+    <string name="trigger_volume">Volume Button Pattern Detection</string>
+    <string name="trigger_shake">Shake Detection</string>
+    <string name="trigger_dial">Dial Code Trigger</string>
+
+    <!-- Emergency Response Labels -->
+    <string name="response_sms">SMS Sent with Live Location</string>
+    <string name="response_call">Calling Primary Contact</string>
+    <string name="response_nearby">Nearby Alert (Firebase)</string>
+    <string name="response_tracking">Live Tracking Active (High Accuracy)</string>
+
+    <!-- Control Button Labels -->
+    <string name="ctrl_add_contact">＋ Add Contact</string>
+    <string name="ctrl_overlay">📱 Enable Background Calls</string>
+    <string name="ctrl_safe_zone">🏠 Safe Zone Settings</string>
 </resources>
