@@ -5,4 +5,14 @@
     <string name="btn_test_trigger">Test Emergency Trigger</string>
     <string name="accessibility_service_label">Alertify Volume Trigger</string>
     <string name="accessibility_description">Required to detect volume button presses for emergency alerts even when the screen is off.</string>
+    
+    <!-- Design System Strings -->
+    <string name="welcome_title">Welcome to Alertify</string>
+    <string name="onboarding_desc">Your safety is our priority. Let\'s set up your personal Guardian Protocol triggers.</string>
+    <string name="dashboard_greeting">Good Evening, Alex Johnson</string>
+    <string name="sos_label">SOS</string>
+    <string name="setup_complete_title">Account Linked Successfully</string>
+    <string name="legal_guide_title">Safety &amp; Legal Guide</string>
+    <string name="transition_msg">Establishing Secure Connection...</string>
+    <string name="permissions_title">Allow Alertify to access your Google Account?</string>
 </resources>

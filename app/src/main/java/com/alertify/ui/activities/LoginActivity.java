@@ -6,16 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.alertify.R;
 import com.google.android.material.button.MaterialButton;
 
-public class MainActivity extends AppCompatActivity {
-
+public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        MaterialButton btnGetStarted = findViewById(R.id.btn_get_started);
-        btnGetStarted.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, OnboardingActivity.class);
+        setContentView(R.layout.activity_login);
+        
+        MaterialButton btnLogin = findViewById(R.id.btn_login);
+        btnLogin.setOnClickListener(v -> {
+            Intent intent = new Intent(this, GooglePermissionsActivity.class);
             startActivity(intent);
         });
     }

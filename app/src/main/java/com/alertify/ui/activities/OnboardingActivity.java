@@ -2,9 +2,9 @@ package com.alertify.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import com.alertify.R;
+import com.google.android.material.button.MaterialButton;
 
 public class OnboardingActivity extends AppCompatActivity {
 
@@ -13,10 +13,9 @@ public class OnboardingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_onboarding);
 
-        Button btnNext = findViewById(R.id.btnNext);
+        MaterialButton btnNext = findViewById(R.id.btn_next);
         btnNext.setOnClickListener(v -> {
-            // After onboarding, go to the Fake Calculator (Stealth Entry)
-            Intent intent = new Intent(OnboardingActivity.this, FakeCalculatorActivity.class);
+            Intent intent = new Intent(OnboardingActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
         });
