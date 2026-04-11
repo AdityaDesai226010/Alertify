@@ -9,10 +9,10 @@ import com.alertify.emergency.EmergencyManager;
 
 public class ShakeDetector implements SensorEventListener {
 
-    private static final int SHAKE_SLOP_TIME_MS = 500;
+    private static final int SHAKE_SLOP_TIME_MS = 200;
     private static final int SHAKE_COUNT_RESET_TIME_MS = 3000;
 
-    private float shakeThreshold = 12.0f;
+    private float shakeThreshold = com.alertify.utils.Constants.SHAKE_THRESHOLD;
     private long lastShakeTimestamp;
     private int shakeCount;
     private Context context;
@@ -56,7 +56,7 @@ public class ShakeDetector implements SensorEventListener {
 
             if (shakeCount >= 3) {
                 shakeCount = 0;
-                EmergencyManager.triggerEmergency(context);
+                com.alertify.services.ConfirmationReceiver.showConfirmationNotification(context);
             }
         }
     }

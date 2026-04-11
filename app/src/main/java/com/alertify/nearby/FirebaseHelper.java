@@ -25,8 +25,8 @@ public class FirebaseHelper {
             DatabaseReference ref = FirebaseDatabase.getInstance().getReference("alerts");
             
             // Generate a unique ID
-            String alertId = ref.push().getKey();
-            if (alertId == null) alertId = UUID.randomUUID().toString();
+            String key = ref.push().getKey();
+            final String alertId = (key != null) ? key : UUID.randomUUID().toString();
 
             // Note: Replace "currentUser" with real user ID (from FirebaseAuth) when auth is implemented
             AlertModel alert = new AlertModel("currentUser", lat, lng, locationLink, System.currentTimeMillis());

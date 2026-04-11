@@ -10,20 +10,64 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.IBinder;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import com.alertify.triggers.ShakeDetector;
+import com.alertify.emergency.EmergencyManager;
+import org.vosk.Model;
+import org.vosk.Recognizer;
+import org.vosk.android.SpeechService;
+import org.vosk.android.StorageService;
+import org.vosk.android.RecognitionListener;
+import android.os.Vibrator;
+import android.os.VibrationEffect;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
+import com.alertify.location.SafeZoneManager;
+import com.alertify.utils.Constants;
+import android.os.PowerManager;
 
-public class BackgroundService extends Service {
+public class BackgroundService extends Service implements RecognitionListener {
+
+    public static final String ACTION_VOSK_STATUS = "com.alertify.VOSK_STATUS";
+    public static final String EXTRA_STATUS = "status";
+    
+    public static final int STATUS_LOADING = 0;
+    public static final int STATUS_READY = 1;
+    public static final int STATUS_ERROR = 2;
 
     private SensorManager sensorManager;
     private ShakeDetector shakeDetector;
+    private Model model;
+    private SpeechService speechService;
+    private Vibrator vibrator;
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+    private PowerManager.WakeLock wakeLock;
     private static final String CHANNEL_ID = "AlertifyBackgroundChannel";
 
     @Override
     public void onCreate() {
         super.onCreate();
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        
+        // DEBUG: 1 long vibration to confirm Service is STARTING
+        if (vibrator != null && vibrator.hasVibrator()) {
+            vibrator.vibrate(500); 
+        }
+
         createNotificationChannel();
+        
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        if (powerManager != null) {
+            wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Alertify:BackgroundServiceWakeLock");
+            wakeLock.acquire();
+        }
         
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Alertify Active")
@@ -33,13 +77,159 @@ public class BackgroundService extends Service {
 
         startForeground(1, notification);
 
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         shakeDetector = new ShakeDetector(this);
         
         Sensor accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         if (accelerometer != null) {
-            sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_UI);
+            sensorManager.registerListener(shakeDetector, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         }
+
+        setupLocationMonitoring();
+
+        // Delay initialization by 1.5s to give MainActivity time to register its UI receiver
+        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(this::initializeVosk, 1500);
+    }
+
+    private void initializeVosk() {
+        android.util.Log.d("Vosk", "Attempting model load...");
+        sendStatus(STATUS_LOADING);
+        
+        // This is the most compatible way to load for 0.3.32+
+        StorageService.unpack(this, "model", "model",
+            (m) -> {
+                this.model = m;
+                android.util.Log.d("Vosk", "SUCCESS: Model ready.");
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(this::startRecognition);
+            },
+            (exception) -> {
+                android.util.Log.e("Vosk", "ERROR: " + exception.getMessage());
+                new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> sendStatus(STATUS_ERROR));
+            }
+        );
+    }
+
+    private void sendStatus(int status) {
+        Intent intent = new Intent(ACTION_VOSK_STATUS);
+        intent.putExtra(EXTRA_STATUS, status);
+        sendBroadcast(intent);
+    }
+
+    private void startRecognition() {
+        try {
+            Recognizer rec = new Recognizer(model, 16000.0f);
+            speechService = new SpeechService(rec, 16000.0f);
+            speechService.startListening(this);
+            android.util.Log.d("Vosk", "Recognition started. Listening...");
+            
+            sendStatus(STATUS_READY);
+            
+            // DIAGNOSTIC VIBRATION: 2 short pulses when ready
+            if (vibrator != null && vibrator.hasVibrator()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createWaveform(new long[]{0, 100, 100, 100}, -1));
+                } else {
+                    vibrator.vibrate(new long[]{0, 100, 100, 100}, -1);
+                }
+            }
+            
+            updateNotification("Voice Monitoring Active");
+        } catch (Exception e) {
+            android.util.Log.e("Vosk", "Error starting recognition: " + e.getMessage());
+            sendStatus(STATUS_ERROR);
+        }
+    }
+
+    private void updateNotification(String text) {
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle("Alertify Protection On")
+                .setContentText(text)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .build();
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (manager != null) {
+            manager.notify(1, notification);
+        }
+    }
+
+    @Override
+    public void onResult(String hypothesis) {
+        checkHypothesis(hypothesis);
+    }
+
+    @Override
+    public void onFinalResult(String hypothesis) {
+        checkHypothesis(hypothesis);
+    }
+
+    @Override
+    public void onPartialResult(String hypothesis) {
+        checkHypothesis(hypothesis);
+    }
+
+    private void checkHypothesis(String json) {
+        if (json == null) return;
+        try {
+            // Vosk returns JSON like {"text": "help me"}
+            org.json.JSONObject obj = new org.json.JSONObject(json);
+            String text = obj.optString("text", "").toLowerCase();
+            String partial = obj.optString("partial", "").toLowerCase();
+            
+            if (text.contains("help me") || partial.contains("help me")) {
+                android.util.Log.d("Vosk", "Emergency Triggered by Voice!");
+                triggerIfSafe();
+            }
+        } catch (org.json.JSONException e) {
+            // Fallback for raw string check
+            if (json.toLowerCase().contains("help me")) {
+                triggerIfSafe();
+            }
+        }
+    }
+
+    private void triggerIfSafe() {
+        if (SafeZoneManager.isCurrentlySafe(this)) {
+            android.util.Log.d("SafeZone", "Trigger blocked by Safe Zone!");
+            return;
+        }
+        EmergencyManager.triggerEmergency(this);
+    }
+
+    private void setupLocationMonitoring() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        
+        LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_BALANCED_POWER_ACCURACY, 60000) // 1 minute
+                .setMinUpdateIntervalMillis(30000) // 30 seconds
+                .build();
+
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                if (locationResult.getLastLocation() != null) {
+                    double lat = locationResult.getLastLocation().getLatitude();
+                    double lng = locationResult.getLastLocation().getLongitude();
+                    SafeZoneManager.updateSafeStatus(BackgroundService.this, lat, lng);
+                }
+            }
+        };
+
+        try {
+            fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+        } catch (SecurityException e) {
+            android.util.Log.e("BackgroundService", "Location permission missing for safe zone monitoring");
+        }
+    }
+
+    @Override
+    public void onError(Exception exception) {
+        // Handle error
+    }
+
+    @Override
+    public void onTimeout() {
+        // Handle timeout
     }
 
     private void createNotificationChannel() {
@@ -47,7 +237,7 @@ public class BackgroundService extends Service {
             NotificationChannel serviceChannel = new NotificationChannel(
                     CHANNEL_ID,
                     "Alertify Background Service Channel",
-                    NotificationManager.IMPORTANCE_DEFAULT
+                    NotificationManager.IMPORTANCE_HIGH
             );
             NotificationManager manager = getSystemService(NotificationManager.class);
             if (manager != null) {
@@ -62,10 +252,32 @@ public class BackgroundService extends Service {
     }
 
     @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(restartServiceIntent);
+        } else {
+            startService(restartServiceIntent);
+        }
+        super.onTaskRemoved(rootIntent);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (sensorManager != null && shakeDetector != null) {
             sensorManager.unregisterListener(shakeDetector);
+        }
+        if (speechService != null) {
+            speechService.stop();
+            speechService.shutdown();
+        }
+        if (fusedLocationClient != null && locationCallback != null) {
+            fusedLocationClient.removeLocationUpdates(locationCallback);
+        }
+        if (wakeLock != null && wakeLock.isHeld()) {
+            wakeLock.release();
         }
     }
 

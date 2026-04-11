@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212">
+
+    <LinearLayout
+        android:id="@+id/contactSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Emergency Contacts"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <EditText
+            android:id="@+id/contactEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter Phone Number"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            android:inputType="phone"
+            android:backgroundTint="#FFFFFF"/>
+
+        <Button
+            android:id="@+id/addContactButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Contact"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/btnAudioSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Grant Audio Permissions"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#4CAF50"/>
+
+        <TextView
+            android:id="@+id/contactsListTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#AAAAAA"
+            android:layout_marginTop="16dp"
+            android:text="No contacts added yet."/>
+
+
+        <Button
+            android:id="@+id/btnOverlayPermission"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Enable Background Calls (Overlay)"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/purple_500"
+            android:textColor="@color/white"/>
+
+        <Button
+            android:id="@+id/btnSafeZone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🏠 Safe Zone Settings"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/accent_blue"
+            android:textColor="@color/white"/>
+
+        <TextView
+            android:id="@+id/safeZoneStatusText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Safe Zone: Active (Triggers Restricted)"
+            android:textColor="@color/success_green"
+            android:gravity="center"
+            android:textStyle="italic"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical">
+
+            <ProgressBar
+                android:id="@+id/modelProgressBar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:indeterminate="true"
+                android:visibility="visible"/>
+
+            <TextView
+                android:id="@+id/modelStatusTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Voice Module: Initializing..."
+                android:textColor="#FFFFFF"
+                android:layout_marginStart="8dp"
+                android:textSize="14sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/statusTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/emergency_status_idle"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/contactSection"
+        android:layout_marginTop="40dp"/>
+
+    <Button
+        android:id="@+id/testTriggerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/statusTextView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="@string/btn_test_trigger" />
+
+</RelativeLayout>
