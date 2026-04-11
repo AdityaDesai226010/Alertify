@@ -17,44 +17,148 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_top_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_main_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Alertify"
-        android:textColor="@color/primary"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/tv_main_slogan"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-    <TextView
-        android:id="@+id/tv_main_slogan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="The Guardian's Glow"
-        android:textColor="@color/on_surface_variant"
-        android:textSize="18sp"
-        android:textStyle="italic"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_main_logo" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="24dp">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_get_started"
-        android:layout_width="200dp"
-        android:layout_height="64dp"
-        android:layout_marginBottom="64dp"
-        android:text="Get Started"
-        app:backgroundTint="@color/primary"
-        app:cornerRadius="32dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+            <TextView
+                android:id="@+id/tv_main_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:text="Alertify"
+                android:textColor="@color/primary"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_top_toTopOf="parent" />
 
+            <TextView
+                android:id="@+id/tv_main_slogan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="The Guardian's Glow"
+                android:textColor="@color/on_surface_variant"
+                android:textSize="18sp"
+                android:textStyle="italic"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_top_toBottomOf="@id/tv_main_logo" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_get_started"
+                android:layout_width="200dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="32dp"
+                android:text="Get Started"
+                app:backgroundTint="@color/primary"
+                app:cornerRadius="32dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_top_toBottomOf="@id/tv_main_slogan" />
+
+            <!-- Functional section (Receding into background as per design system) -->
+            <LinearLayout
+                android:id="@+id/contactSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="48dp"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:alpha="0.8"
+                app:layout_constraintTop_toBottomOf="@id/btn_get_started">
+
+                <TextView
+                    android:id="@+id/statusTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/emergency_status_idle"
+                    android:textColor="@color/on_surface"
+                    android:textSize="18sp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"/>
+
+                <EditText
+                    android:id="@+id/contactEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter Phone Number"
+                    android:textColor="@color/on_surface"
+                    android:inputType="phone" />
+
+                <Button
+                    android:id="@+id/addContactButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Add Contact"
+                    android:layout_marginTop="8dp"/>
+
+                <TextView
+                    android:id="@+id/contactsListTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textColor="@color/on_surface_variant"
+                    android:text="No contacts added yet."/>
+
+                <Button
+                    android:id="@+id/btnOverlayPermission"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Enable Overlay"
+                    android:layout_marginTop="8dp" />
+
+                <Button
+                    android:id="@+id/btnSafeZone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="🏠 Safe Zone Settings"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/safeZoneStatusText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone"/>
+
+                <Button
+                    android:id="@+id/testTriggerButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/btn_test_trigger" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical">
+                    <ProgressBar
+                        android:id="@+id/modelProgressBar"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:indeterminate="true"/>
+                    <TextView
+                        android:id="@+id/modelStatusTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Voice Module: Initializing..."
+                        android:textColor="@color/on_surface"
+                        android:layout_marginStart="8dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
